@@ -39,15 +39,13 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
         }
         private class Result
         {
-            public List<Vector<double>> EigenVectors { get; set; }
-            public List<double> SchwartzConstants { get; set; }
-            public List<double> SchwartzRelations { get; set; }
-            public List<Bound> Bounds { get; set; }
+            public List<Vector<double>> EigenVectors { get; }
+            public List<double> SchwartzConstants { get; }
+            public List<double> SchwartzRelations { get; }
+            public List<Bound> Bounds { get; }
             public double EigenValue { get; set; }
 
             public int NumberSteps => Bounds.Count;
-
-            public bool IsMethodEnded { get; set; }
 
             public Result()
             {
@@ -55,7 +53,6 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
                 SchwartzConstants = new List<double>();
                 SchwartzRelations = new List<double>();
                 Bounds = new List<Bound>();
-                IsMethodEnded = false;
             }
 
         }
@@ -77,12 +74,12 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
         private Result SolveKrylovBogolyubov(InitialСonditions initialСonditions)
         {
             Vector<double> xPartition = GetPartitionForIntegrationLimit(initialСonditions);
-            Matrix<double> operatorMatrix = GetOperatorMatrix(xPartition);
+            Matrix<double> operatorMatrix = GetOperatorMatrix(xPartition, initialСonditions.OperatorCoeficientsFunction);
 
             var krylovBogolyubovResult = new Result();
 
             Vector<double> initialEigenVector = GetFunctionValuesOnPartition(xPartition, initialСonditions.InitialApproximation);
-            Vector<double> operatorCoeficients = GetFunctionValuesOnPartition(xPartition, initialСonditions.OperatorCoeficientsFunction);
+            Vector<double> operatorCoeficients = GetFunctionValuesOnPartition(xPartition, (x) => - 1.0 / initialСonditions.OperatorCoeficientsFunction(x));
 
             var schwartzConstant = GetSchwartzConstant(xPartition, initialEigenVector, initialEigenVector, operatorCoeficients);
 
@@ -94,7 +91,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
 
             do
             {
-                Vector<double> approxtimationVector = GetApproximationVector(krylovBogolyubovResult.EigenVectors[numberStep], operatorCoeficients, initialСonditions.BoundaryConditions);
+                Vector<double> approxtimationVector = GetApproximationVector(krylovBogolyubovResult.EigenVectors[numberStep], /*operatorCoeficients, */initialСonditions.BoundaryConditions);
 
                 Vector<double> nextEigenVector = TridiagonalMatrixAlgorithm(Matrix<double>.Build.DenseOfMatrix(operatorMatrix), Vector<double>.Build.DenseOfVector(approxtimationVector));
 
@@ -135,12 +132,12 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
         private Result SolveKollattsTemple(InitialСonditions initialСonditions)
         {
             Vector<double> xPartition = GetPartitionForIntegrationLimit(initialСonditions);
-            Matrix<double> operatorMatrix = GetOperatorMatrix(xPartition);
+            Matrix<double> operatorMatrix = GetOperatorMatrix(xPartition, initialСonditions.OperatorCoeficientsFunction);
 
             var kollattsTempleResult = new Result();
 
             Vector<double> initialEigenVector = GetFunctionValuesOnPartition(xPartition, initialСonditions.InitialApproximation);
-            Vector<double> operatorCoeficients = GetFunctionValuesOnPartition(xPartition, initialСonditions.OperatorCoeficientsFunction);
+            Vector<double> operatorCoeficients = GetFunctionValuesOnPartition(xPartition, (x) => -1.0 / initialСonditions.OperatorCoeficientsFunction(x));
 
             var schwartzConstant = GetSchwartzConstant(xPartition, initialEigenVector, initialEigenVector, operatorCoeficients);
 
@@ -152,7 +149,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
 
             do
             {
-                Vector<double> approxtimationVector = GetApproximationVector(kollattsTempleResult.EigenVectors[numberStep], operatorCoeficients, initialСonditions.BoundaryConditions);
+                Vector<double> approxtimationVector = GetApproximationVector(kollattsTempleResult.EigenVectors[numberStep], /*operatorCoeficients,*/ initialСonditions.BoundaryConditions);
 
                 Vector<double> nextEigenVector = TridiagonalMatrixAlgorithm(Matrix<double>.Build.DenseOfMatrix(operatorMatrix), Vector<double>.Build.DenseOfVector(approxtimationVector));
 
@@ -223,20 +220,20 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             return result;
         }
 
-        private Matrix<double> GetOperatorMatrix(Vector<double> xPartitions)
+        private Matrix<double> GetOperatorMatrix(Vector<double> xPartitions, Func<double, double> function)
         {
             var matrixDimensional = xPartitions.Count;
             Matrix<double> operatorMatrix = Matrix<double>.Build.Dense(matrixDimensional, matrixDimensional);
             var step = (xPartitions[matrixDimensional - 1] - xPartitions[0]) / (matrixDimensional - 1);
             var squaredStep = step * step;
-            operatorMatrix[0, 0] = -1.0;
-            operatorMatrix[matrixDimensional - 1, matrixDimensional - 1] = -1.0;
+            operatorMatrix[0, 0] = function(xPartitions[0]);
+            operatorMatrix[matrixDimensional - 1, matrixDimensional - 1] = function(xPartitions[matrixDimensional - 1]);
             for (int i = 1; i < matrixDimensional - 1; i++)
             {
 
-                operatorMatrix[i - 1, i] = -1.0 / squaredStep;
-                operatorMatrix[i, i] = 2.0 / squaredStep;
-                operatorMatrix[i + 1, i] = -1.0 / squaredStep;
+                operatorMatrix[i - 1, i] = 1.0 / squaredStep * function(xPartitions[i]);
+                operatorMatrix[i, i] = -2.0 / squaredStep * function(xPartitions[i]);
+                operatorMatrix[i + 1, i] = 1.0 / squaredStep * function(xPartitions[i]);
             }
 
             return operatorMatrix;
@@ -247,11 +244,11 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             return Vector<double>.Build.Dense(partition.Count, i => function(partition[i]));
         }
 
-        private Vector<double> GetApproximationVector(Vector<double> eigenVector, Vector<double> operatorCoeficiesnts, BoundaryConditions boundaryConditions)
+        private Vector<double> GetApproximationVector(Vector<double> eigenVector, /*Vector<double> operatorCoeficiesnts,*/ BoundaryConditions boundaryConditions)
         {
             var approxtimationVector = Vector<double>.Build.Dense(
                 eigenVector.Count,
-                i => eigenVector[i] * operatorCoeficiesnts[i]);
+                i => eigenVector[i]/* * operatorCoeficiesnts[i]*/);
 
             approxtimationVector[0] = boundaryConditions.LeftCondition;
             approxtimationVector[approxtimationVector.Count - 1] = boundaryConditions.RightCondition;
@@ -300,7 +297,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
                     RightCondition = double.Parse(RightConditionTextBox.Text)
                 },
                 InitialApproximation = x => 1,
-                OperatorCoeficientsFunction = x => 1 / Math.Pow(4 + x * x, 2),
+                OperatorCoeficientsFunction = x => -Math.Pow(4 + x * x, 2),
                 NumberPartitions = int.Parse(NumberPartitionsTextBox.Text),
                 Eps = double.Parse(EpsTextBox.Text.Replace('.', ',')),
                 L2 = 32 * Math.PI * Math.PI
