@@ -1,0 +1,30 @@
+﻿<Window x:Class="InitialApproximationAlgorithm.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InitialApproximationAlgorithm"
+        mc:Ignorable="d"
+        Title="Initial approximation algorithm" Height="500" Width="619.833" MinWidth="465" MinHeight="500" >
+    <Grid>
+        <TextBox x:Name="NumberPartitionsTextBox" HorizontalAlignment="Left" Height="23" Margin="164,23,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel" Content="N = " HorizontalAlignment="Left" Margin="125,21,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="CalculateButton" Content="Обчислити" HorizontalAlignment="Left" Margin="125,140,0,0" VerticalAlignment="Top" Width="351" Click="CalculateButtonClick" Height="29"/>
+        <TextBox x:Name="CenterTextBox" HorizontalAlignment="Left" Height="23" Margin="376,23,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="RadiusTextBox" HorizontalAlignment="Left" Height="23" Margin="376,67,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel_Copy" Content="Center = " HorizontalAlignment="Left" Margin="319,21,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="EpsLabel_Copy" Content="Radius = " HorizontalAlignment="Left" Margin="319,65,0,0" VerticalAlignment="Top"/>
+        <DataGrid x:Name="EigenValuesTable" HorizontalAlignment="Left" Margin="51,190,0,10" Width="511" AutoGenerateColumns="False" ItemsSource="{Binding}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="№" Binding="{Binding N}" Width="30"></DataGridTextColumn>
+                <DataGridTextColumn Header="Початкове наближення" Binding="{Binding InitialEigenValue}" Width="*"></DataGridTextColumn>
+                <DataGridTextColumn Header="Уточнене значення" Binding="{Binding ApproximatedEigenValue}" Width="*"></DataGridTextColumn>
+                <DataGridTextColumn Header="Кількість ітерацій" Binding="{Binding CountIteration}" Width="115"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBox x:Name="Lambda0TextBox" HorizontalAlignment="Left" Height="23" Margin="164,67,0,0" TextWrapping="Wrap" Text="179.5" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel_Copy1" Content="Lambda0 = " HorizontalAlignment="Left" Margin="88,65,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="EpsTextBox" HorizontalAlignment="Left" Height="23" Margin="164,106,0,0" TextWrapping="Wrap" Text="0.0001" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel_Copy2" Content="Eps = " HorizontalAlignment="Left" Margin="115,104,0,0" VerticalAlignment="Top"/>
+    </Grid>
+</Window>

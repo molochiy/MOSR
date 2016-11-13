@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FikerMethod", "FikerMethod\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewtonMethod", "NewtonMethod\NewtonMethod.csproj", "{33D464C5-D09A-4F6C-AAEA-660843A8B954}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InitialApproximationAlgorithm", "InitialApproximationAlgorithm\InitialApproximationAlgorithm.csproj", "{C9048571-F4E8-4810-A379-A33606F83755}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9048571-F4E8-4810-A379-A33606F83755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9048571-F4E8-4810-A379-A33606F83755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9048571-F4E8-4810-A379-A33606F83755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9048571-F4E8-4810-A379-A33606F83755}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
