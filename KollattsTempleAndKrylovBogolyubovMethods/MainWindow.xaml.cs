@@ -65,12 +65,13 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             InitializeComponent();
         }
 
+        Result _kollattsTempleResult = new Result();
+        Result _krylovBogolyubovResult = new Result();
+
         private void Solve(InitialСonditions initialСonditions)
         {
-            var kollattsTempleResult = SolveKollattsTemple(initialСonditions);
-            var krylovBogolyubovResult = SolveKrylovBogolyubov(initialСonditions);
-
-            ShowResults(kollattsTempleResult, krylovBogolyubovResult);
+            _kollattsTempleResult = SolveKollattsTemple(initialСonditions);
+            _krylovBogolyubovResult = SolveKrylovBogolyubov(initialСonditions);
         }
 
         private Result SolveKrylovBogolyubov(InitialСonditions initialСonditions)
@@ -101,7 +102,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
 
                 var nextSchwartzConstant = GetSchwartzConstant(xPartition, initialEigenVector, nextEigenVector, operatorCoeficients);
 
-                var nextSchwartzRelation = GetSchwartzRrealtion(krylovBogolyubovResult.SchwartzConstants.Last(), nextSchwartzConstant);
+                var nextSchwartzRelation = GetSchwartzRelation(krylovBogolyubovResult.SchwartzConstants.Last(), nextSchwartzConstant);
 
                 krylovBogolyubovResult.SchwartzConstants.Add(nextSchwartzConstant);
                 krylovBogolyubovResult.SchwartzRelations.Add(nextSchwartzRelation);
@@ -159,7 +160,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
 
                 var nextSchwartzConstant = GetSchwartzConstant(xPartition, initialEigenVector, nextEigenVector, operatorCoeficients);
 
-                var nextSchwartzRelation = GetSchwartzRrealtion(kollattsTempleResult.SchwartzConstants.Last(), nextSchwartzConstant);
+                var nextSchwartzRelation = GetSchwartzRelation(kollattsTempleResult.SchwartzConstants.Last(), nextSchwartzConstant);
                 kollattsTempleResult.SchwartzConstants.Add(nextSchwartzConstant);
 
                 kollattsTempleResult.SchwartzRelations.Add(nextSchwartzRelation);
@@ -189,7 +190,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             return kollattsTempleResult;
         }
 
-        private double GetSchwartzRrealtion(double prevSchwartzConstant, double nextSchwartzConstant)
+        private double GetSchwartzRelation(double prevSchwartzConstant, double nextSchwartzConstant)
         {
             return prevSchwartzConstant / nextSchwartzConstant;
         }
@@ -290,57 +291,72 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             {
                 IntegrationLimits = new IntegrationLimits()
                 {
-                    LowerLimit = 0,
-                    UpperLimit = 1
+                    LowerLimit = double.Parse(LowerLimitTextBox.Text),
+                    UpperLimit = double.Parse(UpperLimitTextBox.Text)
                 },
                 BoundaryConditions = new BoundaryConditions()
                 {
-                    LeftCondition = 0,
-                    RightCondition = 0
+                    LeftCondition = double.Parse(LeftConditionTextBox.Text),
+                    RightCondition = double.Parse(RightConditionTextBox.Text)
                 },
                 InitialApproximation = x => 1,
                 OperatorCoeficientsFunction = x => 1 / Math.Pow(4 + x * x, 2),
                 NumberPartitions = int.Parse(NumberPartitionsTextBox.Text),
-                Eps = double.Parse(EpsTextBox.Text),
-                L2 = 250
+                Eps = double.Parse(EpsTextBox.Text.Replace('.', ',')),
+                L2 = 32 * Math.PI * Math.PI
             };
 
             Solve(initialСonditions);
+            ShowKollattsTempleResult(_kollattsTempleResult, initialСonditions.L2);
+            ShowKrylovBogolyubovResult(_krylovBogolyubovResult);
         }
 
-        private void ShowResults(Result resultKT, Result resultKB)
+        private void ShowKollattsTempleResult(Result resultKT, double l2)
         {
             IterationNumberKT.Content = resultKT.NumberSteps;
-            IterationNumberKB.Content = resultKB.NumberSteps;
-
             ResultKT.Content = resultKT.EigenValue;
+            SecondEigenValue.Content = l2;
+
+
+            var constants = resultKT.SchwartzConstants.Select((x, i) => new
+            {
+                N = i,
+                Constant = x
+            }).ToList();
+
+            schwartzValuesTableKT.ItemsSource = constants;
+
+            var bounds = resultKT.Bounds.Select((x, i) => new
+            {
+                N = i,
+                LowerBound = x.LowerBound,
+                UpperBound = x.UpperBound
+            }).ToList();
+
+            BoundsTableKT.ItemsSource = bounds;
+        }
+
+        private void ShowKrylovBogolyubovResult(Result resultKB)
+        {
+            IterationNumberKB.Content = resultKB.NumberSteps;
             ResultKB.Content = resultKB.EigenValue;
 
-            schwartzValuesTable.ItemsSource = resultKB.SchwartzConstants.Select((x, i) => new
+            var constants = resultKB.SchwartzConstants.Select((x, i) => new
             {
-                Index = i,
-                Value = x
-            });
-            schwartzRelationsTable.ItemsSource = resultKB.SchwartzRelations.Select((x, i) => new
-            {
-                Index = i + 1,
-                Value = x
-            });
+                N = i,
+                Constant = x
+            }).ToList();
 
-            //boundsTableKT.ItemsSource = resultKT.Bounds.Select((x, i) => new
-            //{
-            //    Index = i + 1,
-            //    Lower = x.Lower,
-            //    Upper = x.Upper,
-            //    Difference = x.Upper - x.Lower
-            //});
-            //boundsTableKB.ItemsSource = resultKB.Bounds.Select((x, i) => new
-            //{
-            //    Index = i + 1,
-            //    Lower = x.Lower,
-            //    Upper = x.Upper,
-            //    Difference = x.Upper - x.Lower
-            //});
+            schwartzValuesTableKB.ItemsSource = constants;
+
+            var bounds = resultKB.Bounds.Select((x, i) => new
+            {
+                N = i,
+                LowerBound = x.LowerBound,
+                UpperBound = x.UpperBound
+            }).ToList();
+
+            BoundsTableKB.ItemsSource = bounds;
         }
     }
 }

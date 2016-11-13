@@ -5,29 +5,75 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KollattsTempleAndKrylovBogolyubovMethods"
         mc:Ignorable="d"
-        Title="MainWindow" Height="718" Width="619.797" ResizeMode="NoResize">
+        Title="MOSR" Height="700" Width="700" WindowStartupLocation="CenterOwner" MinWidth="700" MinHeight="700" MaxWidth="697">
     <Grid>
         <TextBox x:Name="NumberPartitionsTextBox" HorizontalAlignment="Left" Height="23" Margin="80,27,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="EpsTextBox" HorizontalAlignment="Left" Height="23" Margin="80,71,0,0" TextWrapping="Wrap" Text="0.0001" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="EpsTextBox" HorizontalAlignment="Left" Height="23" Margin="80,71,0,0" TextWrapping="Wrap" Text="0,0001" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="NumberPartitionsLabel" Content="N = " HorizontalAlignment="Left" Margin="41,27,0,0" VerticalAlignment="Top"/>
         <Label x:Name="EpsLabel" Content="eps = " HorizontalAlignment="Left" Margin="32,68,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="CalculateButton" Content="Calculate" HorizontalAlignment="Left" Margin="80,126,0,0" VerticalAlignment="Top" Width="75" Click="CalculateButtonClick"/>
-        <Label x:Name="label" Content="Метод Коллатца-Темпля" HorizontalAlignment="Left" Margin="269,20,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label_Copy" Content="Метод Крилова-Боголюбова" HorizontalAlignment="Left" Margin="269,144,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1" Content="Ітерацій" HorizontalAlignment="Left" Margin="269,92,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label1_Copy" Content="Ітерацій" HorizontalAlignment="Left" Margin="269,216,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="IterationNumberKT" Content="" HorizontalAlignment="Left" Margin="419,92,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="IterationNumberKB" Content="" HorizontalAlignment="Left" Margin="419,216,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label2" Content="Власне значення" HorizontalAlignment="Left" Margin="269,56,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="ResultKT" Content="" HorizontalAlignment="Left" Margin="419,56,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label2_Copy" Content="Власне значення" HorizontalAlignment="Left" Margin="269,180,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="ResultKB" Content="" HorizontalAlignment="Left" Margin="419,180,0,0" VerticalAlignment="Top"/>
-        <Separator HorizontalAlignment="Left" Height="11" Margin="269,45,0,0" VerticalAlignment="Top" Width="184"/>
-        <Separator HorizontalAlignment="Left" Height="11" Margin="269,169,0,0" VerticalAlignment="Top" Width="215"/>
-        <DataGrid x:Name="schwartzValuesTable" FontSize="14" Margin="10,300,0,10" HorizontalAlignment="Left" Width="250"/>
-        <DataGrid x:Name="schwartzRelationsTable" FontSize="14" Margin="0,300,10,10" HorizontalAlignment="Right" Width="250"/>
-        <Label x:Name="label3" Content="Сталі Шварца:" HorizontalAlignment="Left" Margin="10,269,10,10" VerticalAlignment="Top"/>
-        <Label x:Name="label4" Content="Відношення Шварца:" HorizontalAlignment="Left" Margin="354,269,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="CalculateButton" Content="Обчислити" HorizontalAlignment="Left" Margin="80,118,0,0" VerticalAlignment="Top" Width="525" Click="CalculateButtonClick" Height="29"/>
+        <TabControl x:Name="tabControl" Margin="0,169,0,0">
+            <TabItem Header="Метод Коллатца-Темпля">
+                <Grid Background="#FFE5E5E5">
+                    <Label x:Name="label" Content="Метод Коллатца-Темпля" HorizontalAlignment="Left" Margin="10,16,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label1" Content="Ітерацій" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="IterationNumberKT" Content="" HorizontalAlignment="Left" Margin="111,77,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label2" Content="Власне значення" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="ResultKT" Content="" HorizontalAlignment="Left" Margin="111,52,0,0" VerticalAlignment="Top"/>
+                    <Separator HorizontalAlignment="Left" Height="11" Margin="10,41,0,0" VerticalAlignment="Top" Width="230"/>
+                    <DataGrid x:Name="schwartzValuesTableKT" FontSize="14" Margin="16,161,0,10" HorizontalAlignment="Left" Width="250" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Ітерація" Binding="{Binding N}" Width="70"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Стала" Binding="{Binding Constant}" Width="*"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <DataGrid x:Name="BoundsTableKT" FontSize="14" Margin="360,161,10,10" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Ітерація" Binding="{Binding N}" Width="70"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Нижня межа" Binding="{Binding LowerBound}" Width="*"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Верхня межа" Binding="{Binding UpperBound}" Width="*"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Label x:Name="label3_Copy" Content="Сталі Шварца:" HorizontalAlignment="Left" Margin="16,130,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label4_Copy" Content="Границі:" HorizontalAlignment="Left" Margin="360,130,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label1_Copy1" Content="L2" HorizontalAlignment="Left" Margin="10,100,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="SecondEigenValue" Content="" HorizontalAlignment="Left" Margin="111,100,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Метод Крилова-Боголюбова">
+                <Grid Background="#FFE5E5E5">
+                    <Label x:Name="label_Copy" Content="Метод Крилова-Боголюбова" HorizontalAlignment="Left" Margin="10,16,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label1_Copy" Content="Ітерацій" HorizontalAlignment="Left" Margin="10,77,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="IterationNumberKB" Content="" HorizontalAlignment="Left" Margin="111,77,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label2_Copy" Content="Власне значення" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="ResultKB" Content="" HorizontalAlignment="Left" Margin="111,52,0,0" VerticalAlignment="Top"/>
+                    <Separator HorizontalAlignment="Left" Height="11" Margin="10,41,0,0" VerticalAlignment="Top" Width="230"/>
+                    <DataGrid x:Name="schwartzValuesTableKB" FontSize="14" Margin="16,161,0,10" HorizontalAlignment="Left" Width="250" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Ітерація" Binding="{Binding N}" Width="70"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Стала" Binding="{Binding Constant}" Width="*"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <DataGrid x:Name="BoundsTableKB" FontSize="14" Margin="360,161,10,10" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Ітерація" Binding="{Binding N}" Width="70"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Нижня межа" Binding="{Binding LowerBound}" Width="*"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Верхня межа" Binding="{Binding UpperBound}" Width="*"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Label x:Name="label3_Copy1" Content="Сталі Шварца:" HorizontalAlignment="Left" Margin="16,130,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="label4_Copy1" Content="Границі:" HorizontalAlignment="Left" Margin="360,130,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <TextBox x:Name="LowerLimitTextBox" HorizontalAlignment="Left" Height="23" Margin="302,27,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="UpperLimitTextBox" HorizontalAlignment="Left" Height="23" Margin="302,71,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel_Copy" Content="a = " HorizontalAlignment="Left" Margin="263,27,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="EpsLabel_Copy" Content="b = " HorizontalAlignment="Left" Margin="263,71,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LeftConditionTextBox" HorizontalAlignment="Left" Height="23" Margin="548,27,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="RightConditionTextBox" HorizontalAlignment="Left" Height="23" Margin="548,71,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel_Copy1" Content="y(a) = " HorizontalAlignment="Left" Margin="509,27,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="EpsLabel_Copy1" Content="y(b) =" HorizontalAlignment="Left" Margin="509,68,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
