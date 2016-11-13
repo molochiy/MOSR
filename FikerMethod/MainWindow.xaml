@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FikerMethod"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="465" MinWidth="465" MinHeight="500" MaxWidth="465">
+        Title="Fiker's method" Height="500" Width="465" MinWidth="465" MinHeight="500" MaxWidth="465">
     <Grid>
         <TextBox x:Name="NumberPartitionsTextBox" HorizontalAlignment="Left" Height="23" Margin="90,48,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="NumberPartitionsLabel" Content="N = " HorizontalAlignment="Left" Margin="51,48,0,0" VerticalAlignment="Top"/>

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KollattsTempleAndKrylovBogo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FikerMethod", "FikerMethod\FikerMethod.csproj", "{FD4D5ECA-DB25-47B4-A11F-22840665AC84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewtonMethod", "NewtonMethod\NewtonMethod.csproj", "{33D464C5-D09A-4F6C-AAEA-660843A8B954}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33D464C5-D09A-4F6C-AAEA-660843A8B954}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
