@@ -5,8 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FikerMethod"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="500" Width="465" MinWidth="465" MinHeight="500" MaxWidth="465">
     <Grid>
-        
+        <TextBox x:Name="NumberPartitionsTextBox" HorizontalAlignment="Left" Height="23" Margin="90,48,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel" Content="N = " HorizontalAlignment="Left" Margin="51,48,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="CalculateButton" Content="Обчислити" HorizontalAlignment="Left" Margin="51,116,0,0" VerticalAlignment="Top" Width="351" Click="CalculateButtonClick" Height="29"/>
+        <TextBox x:Name="LowerLimitTextBox" HorizontalAlignment="Left" Height="23" Margin="302,27,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="UpperLimitTextBox" HorizontalAlignment="Left" Height="23" Margin="302,71,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="NumberPartitionsLabel_Copy" Content="a = " HorizontalAlignment="Left" Margin="263,27,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="EpsLabel_Copy" Content="b = " HorizontalAlignment="Left" Margin="263,71,0,0" VerticalAlignment="Top"/>
+        <DataGrid x:Name="EigenValuesTable" HorizontalAlignment="Left" Margin="51,190,0,10" Width="351" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="№" Binding="{Binding N}" Width="25"></DataGridTextColumn>
+                <DataGridTextColumn Header="Власне значення" Binding="{Binding EigenValue}" Width="*"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

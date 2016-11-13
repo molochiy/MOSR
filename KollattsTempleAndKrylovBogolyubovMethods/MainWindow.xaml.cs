@@ -248,7 +248,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             return Vector<double>.Build.Dense(partition.Count, i => function(partition[i]));
         }
 
-        private Vector<double> GetApproximationVector(Vector<double> eigenVector, /*Vector<double> operatorCoeficiesnts,*/ BoundaryConditions boundaryConditions)
+        private Vector<double> GetApproximationVector(Vector<double> eigenVector, BoundaryConditions boundaryConditions)
         {
             var approxtimationVector = Vector<double>.Build.Dense(
                 eigenVector.Count,
