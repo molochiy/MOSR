@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KollattsTempleAndKrylovBogolyubovMethods", "KollattsTempleAndKrylovBogolyubovMethods\KollattsTempleAndKrylovBogolyubovMethods.csproj", "{EA2B6D79-41FA-44BE-9F8B-A3AA53FDDC8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FikerMethod", "FikerMethod\FikerMethod.csproj", "{FD4D5ECA-DB25-47B4-A11F-22840665AC84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{EA2B6D79-41FA-44BE-9F8B-A3AA53FDDC8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA2B6D79-41FA-44BE-9F8B-A3AA53FDDC8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA2B6D79-41FA-44BE-9F8B-A3AA53FDDC8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD4D5ECA-DB25-47B4-A11F-22840665AC84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

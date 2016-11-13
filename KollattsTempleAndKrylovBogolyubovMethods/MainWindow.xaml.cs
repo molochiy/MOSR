@@ -79,6 +79,8 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             var krylovBogolyubovResult = new Result();
 
             Vector<double> initialEigenVector = GetFunctionValuesOnPartition(xPartition, initialСonditions.InitialApproximation);
+            initialEigenVector = GetApproximationVector(initialEigenVector,
+                initialСonditions.BoundaryConditions);
             Vector<double> operatorCoeficients = GetFunctionValuesOnPartition(xPartition, (x) => - 1.0 / initialСonditions.OperatorCoeficientsFunction(x));
 
             var schwartzConstant = GetSchwartzConstant(xPartition, initialEigenVector, initialEigenVector, operatorCoeficients);
@@ -91,7 +93,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
 
             do
             {
-                Vector<double> approxtimationVector = GetApproximationVector(krylovBogolyubovResult.EigenVectors[numberStep], /*operatorCoeficients, */initialСonditions.BoundaryConditions);
+                Vector<double> approxtimationVector = GetApproximationVector(krylovBogolyubovResult.EigenVectors[numberStep], initialСonditions.BoundaryConditions);
 
                 Vector<double> nextEigenVector = TridiagonalMatrixAlgorithm(Matrix<double>.Build.DenseOfMatrix(operatorMatrix), Vector<double>.Build.DenseOfVector(approxtimationVector));
 
@@ -137,6 +139,8 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
             var kollattsTempleResult = new Result();
 
             Vector<double> initialEigenVector = GetFunctionValuesOnPartition(xPartition, initialСonditions.InitialApproximation);
+            initialEigenVector = GetApproximationVector(initialEigenVector,
+                initialСonditions.BoundaryConditions);
             Vector<double> operatorCoeficients = GetFunctionValuesOnPartition(xPartition, (x) => -1.0 / initialСonditions.OperatorCoeficientsFunction(x));
 
             var schwartzConstant = GetSchwartzConstant(xPartition, initialEigenVector, initialEigenVector, operatorCoeficients);
@@ -149,7 +153,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
 
             do
             {
-                Vector<double> approxtimationVector = GetApproximationVector(kollattsTempleResult.EigenVectors[numberStep], /*operatorCoeficients,*/ initialСonditions.BoundaryConditions);
+                Vector<double> approxtimationVector = GetApproximationVector(kollattsTempleResult.EigenVectors[numberStep], initialСonditions.BoundaryConditions);
 
                 Vector<double> nextEigenVector = TridiagonalMatrixAlgorithm(Matrix<double>.Build.DenseOfMatrix(operatorMatrix), Vector<double>.Build.DenseOfVector(approxtimationVector));
 
@@ -248,7 +252,7 @@ namespace KollattsTempleAndKrylovBogolyubovMethods
         {
             var approxtimationVector = Vector<double>.Build.Dense(
                 eigenVector.Count,
-                i => eigenVector[i]/* * operatorCoeficiesnts[i]*/);
+                i => eigenVector[i]);
 
             approxtimationVector[0] = boundaryConditions.LeftCondition;
             approxtimationVector[approxtimationVector.Count - 1] = boundaryConditions.RightCondition;
