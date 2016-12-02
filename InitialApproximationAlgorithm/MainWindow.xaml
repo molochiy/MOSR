@@ -10,8 +10,8 @@
         <TextBox x:Name="NumberPartitionsTextBox" HorizontalAlignment="Left" Height="23" Margin="164,23,0,0" TextWrapping="Wrap" Text="100" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="NumberPartitionsLabel" Content="N = " HorizontalAlignment="Left" Margin="125,21,0,0" VerticalAlignment="Top"/>
         <Button x:Name="CalculateButton" Content="Обчислити" HorizontalAlignment="Left" Margin="125,140,0,0" VerticalAlignment="Top" Width="351" Click="CalculateButtonClick" Height="29"/>
-        <TextBox x:Name="CenterTextBox" HorizontalAlignment="Left" Height="23" Margin="376,23,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="RadiusTextBox" HorizontalAlignment="Left" Height="23" Margin="376,67,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="CenterTextBox" HorizontalAlignment="Left" Height="23" Margin="376,23,0,0" TextWrapping="Wrap" Text="175" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="RadiusTextBox" HorizontalAlignment="Left" Height="23" Margin="376,67,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="NumberPartitionsLabel_Copy" Content="Center = " HorizontalAlignment="Left" Margin="319,21,0,0" VerticalAlignment="Top"/>
         <Label x:Name="EpsLabel_Copy" Content="Radius = " HorizontalAlignment="Left" Margin="319,65,0,0" VerticalAlignment="Top"/>
         <DataGrid x:Name="EigenValuesTable" HorizontalAlignment="Left" Margin="51,190,0,10" Width="511" AutoGenerateColumns="False" ItemsSource="{Binding}">
@@ -22,8 +22,6 @@
                 <DataGridTextColumn Header="Кількість ітерацій" Binding="{Binding CountIteration}" Width="115"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox x:Name="Lambda0TextBox" HorizontalAlignment="Left" Height="23" Margin="164,67,0,0" TextWrapping="Wrap" Text="179.5" VerticalAlignment="Top" Width="120"/>
-        <Label x:Name="NumberPartitionsLabel_Copy1" Content="Lambda0 = " HorizontalAlignment="Left" Margin="88,65,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="EpsTextBox" HorizontalAlignment="Left" Height="23" Margin="164,106,0,0" TextWrapping="Wrap" Text="0.0001" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="NumberPartitionsLabel_Copy2" Content="Eps = " HorizontalAlignment="Left" Margin="115,104,0,0" VerticalAlignment="Top"/>
     </Grid>

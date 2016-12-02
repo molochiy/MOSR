@@ -24,12 +24,13 @@ namespace InitialApproximationAlgorithm
         public double Center { get; set; }
         public double Radius { get; set; }
     }
+
     public class InitialСonditions
     {
         public Circle Circle { get; set; }
-        public Func<double, double> OperatorCoeficientsFunction { get; set; }
-        public Func<double, double> DerivedOperatorCoeficientsFunction { get; set; }
-        public Func<double, double> SecondDerivedOperatorCoeficientsFunction { get; set; }
+        public Func<Complex, Complex> OperatorCoeficientsFunction { get; set; }
+        public Func<Complex, Complex> DerivedOperatorCoeficientsFunction { get; set; }
+        public Func<Complex, Complex> SecondDerivedOperatorCoeficientsFunction { get; set; }
         public int NumberPartitions { get; set; }
         public double Eps { get; set; }
         public double L0 { get; set; }
@@ -37,21 +38,21 @@ namespace InitialApproximationAlgorithm
 
     public class Decomposition
     {
-        public Matrix<double> L { get; set; }
-        public Matrix<double> U { get; set; }
-        public Matrix<double> V { get; set; }
-        public Matrix<double> M { get; set; }
-        public Matrix<double> W { get; set; }
-        public Matrix<double> N { get; set; }
+        public Matrix<Complex> L { get; set; }
+        public Matrix<Complex> U { get; set; }
+        public Matrix<Complex> V { get; set; }
+        public Matrix<Complex> M { get; set; }
+        public Matrix<Complex> W { get; set; }
+        public Matrix<Complex> N { get; set; }
 
         public Decomposition(int demension)
         {
-            L = Matrix<double>.Build.DenseIdentity(demension, demension);
-            M = Matrix<double>.Build.DenseIdentity(demension, demension);
-            N = Matrix<double>.Build.DenseIdentity(demension, demension);
-            U = Matrix<double>.Build.Dense(demension, demension);
-            V = Matrix<double>.Build.Dense(demension, demension);
-            W = Matrix<double>.Build.Dense(demension, demension);
+            L = Matrix<Complex>.Build.DenseIdentity(demension, demension);
+            M = Matrix<Complex>.Build.DenseIdentity(demension, demension);
+            N = Matrix<Complex>.Build.DenseIdentity(demension, demension);
+            U = Matrix<Complex>.Build.Dense(demension, demension);
+            V = Matrix<Complex>.Build.Dense(demension, demension);
+            W = Matrix<Complex>.Build.Dense(demension, demension);
         }
     }
 
@@ -62,9 +63,6 @@ namespace InitialApproximationAlgorithm
         public int CountIteration { get; set; }
     }
 
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         Object lockMe = new Object();
@@ -73,10 +71,200 @@ namespace InitialApproximationAlgorithm
             InitializeComponent();
         }
 
-        private Matrix<double> GetMatrixByFunction(Vector<double> xPartitions, Func<double, double> function)
+        private void CalculateButtonClick(object sender, RoutedEventArgs e)
+        {
+            InitialСonditions initialСonditions = new InitialСonditions
+            {
+                Circle = new Circle()
+                {
+                    Center = double.Parse(CenterTextBox.Text.Replace('.', ',')),
+                    Radius = double.Parse(RadiusTextBox.Text.Replace('.', ','))
+                },
+                OperatorCoeficientsFunction = x => -(4 + x * x) * (4 + x * x),
+                DerivedOperatorCoeficientsFunction = x => -4 * (4 + x * x) * x,
+                SecondDerivedOperatorCoeficientsFunction = x => -16 - 12 * x * x,
+                NumberPartitions = int.Parse(NumberPartitionsTextBox.Text),
+                Eps = double.Parse(EpsTextBox.Text.Replace('.', ','))
+            };
+
+            var results = GetInitialApproximationWithAproximatedEigenValues(initialСonditions);
+            AddRowsToEigenValuesTable(results);
+        }
+
+        private List<Result> GetInitialApproximationWithAproximatedEigenValues(InitialСonditions initialСonditions)
+        {
+            var results = new List<Result>();
+            var sk0 = GetSkValue(initialСonditions, 0);
+            int countEigenValues = (int)Math.Round(sk0);
+            var initialEigenValues = new List<Complex>();
+            var sk = new List<double>();
+
+            for (int j = 1; j <= countEigenValues; j++)
+            {
+                var skj = GetSkValue(initialСonditions, j);
+                sk.Add(skj);
+                //double jPartition = j * 1.0 / countEigenValues;
+
+                //var jInitialLambda = initialСonditions.Circle.Center +
+                                     //GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
+
+                //initialEigenValues.Add(jInitialLambda);
+                initialСonditions.L0 = skj;
+
+                var result = SolveNewtonMethod(initialСonditions);
+
+                results.Add(result);
+            }
+
+            #region Parallel
+            /*Parallel.For(0, countEigenValues, (j) =>
+            {
+                double jPartition = j * 1.0 / countEigenValues;
+
+                var jInitialLambda = initialСonditions.Circle.Center +
+                                     GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
+
+                initialСonditions.L0 = jInitialLambda;
+
+                var result = SolveNewtonMethod(initialСonditions);
+
+                lock (lockMe)
+                {
+                    results.Add(result);
+                }
+            });*/
+            #endregion
+
+            return results;
+        }
+
+        private double GetSkValue(InitialСonditions initialСonditions, int k)
+        {
+            Complex sum = Complex.Zero;
+
+            var numberPartitions = initialСonditions.NumberPartitions;
+            var radius = initialСonditions.Circle.Radius;
+            var center = initialСonditions.Circle.Center;
+
+            var xPartitions = GetPartitionForIntegrationLimit(initialСonditions);
+
+            for (int j = 1; j <= numberPartitions; j++)
+            {
+                var spectralRadius = GetSpectralRadius(radius, j, numberPartitions);
+                var jLambda = center + spectralRadius;
+
+                var matrixD = GetMatrixForDecomposition(xPartitions, initialСonditions.OperatorCoeficientsFunction,
+                    jLambda);
+
+                var matrixB = GetMatrixForDecomposition(xPartitions, initialСonditions.DerivedOperatorCoeficientsFunction,
+                    jLambda);
+
+                var matrixC = GetMatrixForDecomposition(xPartitions, initialСonditions.SecondDerivedOperatorCoeficientsFunction,
+                    jLambda);
+
+                var decomposition = GetDecompositionMatrices(matrixD, matrixB, matrixC);
+
+                var sumDividedDiagonalElements = GetSumForDivideVUDiagonal(decomposition);
+
+                sum += Complex.Pow(jLambda, k) * spectralRadius * sumDividedDiagonalElements;
+            }
+
+            #region Comment
+            /*var xPartitions = GetPartitionForIntegrationLimit(initialСonditions);
+
+            for (int j = 0; j <= initialСonditions.NumberPartitions; j++)
+            {
+                var jPartition = j * 1.0 / initialСonditions.NumberPartitions;
+
+                var spectralRadius = GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
+
+                var jLambda = initialСonditions.Circle.Center + spectralRadius;
+
+                var matrixD = GetMatrixForDecomposition(xPartitions, initialСonditions.OperatorCoeficientsFunction,
+                    jLambda);
+
+                var matrixB = GetMatrixForDecomposition(xPartitions, initialСonditions.DerivedOperatorCoeficientsFunction,
+                    jLambda);
+
+                var matrixC = GetMatrixForDecomposition(xPartitions, initialСonditions.SecondDerivedOperatorCoeficientsFunction,
+                    jLambda);
+
+                var decomposition = GetDecompositionMatrices(matrixD, matrixB, matrixC);
+
+                var sumDividedDiagonalElements = GetSumForDivideVUDiagonal(decomposition);
+
+                sum += spectralRadius * sumDividedDiagonalElements;
+            }*/
+            #endregion
+
+            #region Parallel
+            /*Parallel.For(1, initialСonditions.NumberPartitions, (j) =>
+            {
+                var jPartition = j * 1.0 / initialСonditions.NumberPartitions;
+                var spectralRadius = GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
+                var jLambda = initialСonditions.Circle.Center + spectralRadius;
+
+                var matrixD = GetMatrixForDecomposition(xPartitions, initialСonditions.OperatorCoeficientsFunction,
+                    jLambda.Magnitude);
+
+                var matrixB = GetMatrixForDecomposition(xPartitions,
+                    initialСonditions.DerivedOperatorCoeficientsFunction,
+                    jLambda.Magnitude);
+
+                var matrixC = GetMatrixForDecomposition(xPartitions,
+                    initialСonditions.SecondDerivedOperatorCoeficientsFunction,
+                    jLambda.Magnitude);
+
+                var decomposition = GetDecompositionMatrices(matrixD, matrixB, matrixC);
+
+                var deltaLambda = 1 / GetDeltaLambda(decomposition);
+
+                lock (lockMe)
+                {
+                    sum += spectralRadius * deltaLambda;
+                }
+            });*/
+            #endregion
+
+            sum /= initialСonditions.NumberPartitions * initialСonditions.NumberPartitions;
+
+            return sum.Magnitude;
+
+        }
+
+        private Vector<double> GetPartitionForIntegrationLimit(InitialСonditions initialСonditions)
+        {
+            var step = 1.0 / initialСonditions.NumberPartitions;
+            return Vector<double>.Build.Dense(
+                initialСonditions.NumberPartitions + 1,
+                i => i * step);
+            //var step = 2 * initialСonditions.Circle.Radius / initialСonditions.NumberPartitions;
+            //var startPoint = initialСonditions.Circle.Center - initialСonditions.Circle.Radius;
+
+            //return Vector<double>.Build.Dense(
+            //    initialСonditions.NumberPartitions + 1,
+            //    i => startPoint + i * step);
+        }
+
+        private Complex GetSpectralRadius(double radius, double j, int numberPartition)
+        {
+            return radius * Complex.Exp(Complex.ImaginaryOne * 2 * Math.PI * j / numberPartition);
+        }
+
+        private Matrix<Complex> GetMatrixForDecomposition(Vector<double> xPartitions, Func<Complex, Complex> function, Complex lambda)
+        {
+            int dimensional = xPartitions.Count;
+
+            var matrixA = GetMatrixByFunction(xPartitions, function);
+            var matrixLambdaI = Matrix<Complex>.Build.DenseDiagonal(dimensional, lambda);
+
+            return matrixA - matrixLambdaI;
+        }
+
+        private Matrix<Complex> GetMatrixByFunction(Vector<double> xPartitions, Func<Complex, Complex> function)
         {
             var matrixDimensional = xPartitions.Count;
-            Matrix<double> operatorMatrix = Matrix<double>.Build.Dense(matrixDimensional, matrixDimensional);
+            Matrix<Complex> operatorMatrix = Matrix<Complex>.Build.Dense(matrixDimensional, matrixDimensional);
             var step = (xPartitions[matrixDimensional - 1] - xPartitions[0]) / (matrixDimensional - 1);
             var squaredStep = step * step;
             operatorMatrix[0, 0] = function(xPartitions[0]);
@@ -92,48 +280,7 @@ namespace InitialApproximationAlgorithm
             return operatorMatrix;
         }
 
-        private Matrix<double> GetMatrixForDecomposition(Vector<double> xPartitions, Func<double, double> function, double lambda)
-        {
-            int dimensional = xPartitions.Count;
-
-            var matrixA = GetMatrixByFunction(xPartitions, function);
-            var matrixLambdaI = Matrix<double>.Build.DenseDiagonal(dimensional, lambda);
-
-            return matrixA - matrixLambdaI;
-        }
-
-        private double GetSumForDivideVUDiagonal(Decomposition decomposition)
-        {
-            var sum = 0.0;
-
-            int dimension = decomposition.V.ColumnCount;
-
-            for (int i = 0; i < dimension; i++)
-            {
-                sum += decomposition.V[i, i] / decomposition.U[i, i];
-            }
-
-            return sum;
-        }
-
-        private double GetDeltaLambda(Decomposition decomposition)
-        {
-            double sum = GetSumForDivideVUDiagonal(decomposition);
-            
-            double deltaLambda = 1.0 / sum;
-
-            return deltaLambda;
-        }
-
-        private Vector<double> GetPartitionForIntegrationLimit(InitialСonditions initialСonditions)
-        {
-            var step = (initialСonditions.Circle.Center - initialСonditions.Circle.Radius) / initialСonditions.NumberPartitions;
-            return Vector<double>.Build.Dense(
-                initialСonditions.NumberPartitions + 1,
-                i => initialСonditions.Circle.Radius + i * step);
-        }
-
-        private Decomposition GetDecompositionMatrices(Matrix<double> matrixD, Matrix<double> matrixB, Matrix<double> matrixC)
+        private Decomposition GetDecompositionMatrices(Matrix<Complex> matrixD, Matrix<Complex> matrixB, Matrix<Complex> matrixC)
         {
             int dimensional = matrixD.ColumnCount;
 
@@ -143,9 +290,9 @@ namespace InitialApproximationAlgorithm
             {
                 for (int k = r; k < dimensional; k++)
                 {
-                    double sumForU = 0;
-                    double sumForV = 0;
-                    double sumForW = 0;
+                    var sumForU = Complex.Zero;
+                    var sumForV = Complex.Zero;
+                    var sumForW = Complex.Zero;
 
                     for (int j = 0; j < r; j++)
                     {
@@ -166,9 +313,9 @@ namespace InitialApproximationAlgorithm
 
                 for (int i = r + 1; i < dimensional; i++)
                 {
-                    double sumForL = 0;
-                    double sumForM = 0;
-                    double sumForN = 0;
+                    var sumForL = Complex.Zero;
+                    var sumForM = Complex.Zero;
+                    var sumForN = Complex.Zero;
 
                     for (int j = 0; j < r; j++)
                     {
@@ -200,85 +347,29 @@ namespace InitialApproximationAlgorithm
             return decomposition;
         }
 
-        private int GetLambdaCount(InitialСonditions initialСonditions)
+        private Complex GetSumForDivideVUDiagonal(Decomposition decomposition)
         {
-            Complex sum = Complex.Zero;
+            var sum = Complex.Zero;
 
-            var xPartitions = GetPartitionForIntegrationLimit(initialСonditions);
+            int dimension = decomposition.V.ColumnCount;
 
-            for (int j = 0; j <= initialСonditions.NumberPartitions; j++)
+            for (int i = 0; i < dimension; i++)
             {
-                var jPartition = j * 1.0 / initialСonditions.NumberPartitions;
-
-                var spectralRadius = GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
-
-                var jLambda = initialСonditions.Circle.Center + spectralRadius;
-
-                var jLambdaReal = jLambda.Real;
-
-                var matrixD = GetMatrixForDecomposition(xPartitions, initialСonditions.OperatorCoeficientsFunction,
-                    jLambdaReal);
-
-                var matrixB = GetMatrixForDecomposition(xPartitions, initialСonditions.DerivedOperatorCoeficientsFunction,
-                    jLambdaReal);
-
-                var matrixC = GetMatrixForDecomposition(xPartitions, initialСonditions.SecondDerivedOperatorCoeficientsFunction,
-                    jLambdaReal);
-
-                var decomposition = GetDecompositionMatrices(matrixD, matrixB, matrixC);
-
-                var sumDividedDiagonalElements = GetSumForDivideVUDiagonal(decomposition);
-
-                sum += spectralRadius * sumDividedDiagonalElements;
+                sum += decomposition.V[i, i] / decomposition.U[i, i];
             }
 
-            /*Parallel.For(1, initialСonditions.NumberPartitions, (j) =>
-            {
-                var jPartition = j * 1.0 / initialСonditions.NumberPartitions;
-                var spectralRadius = GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
-                var jLambda = initialСonditions.Circle.Center + spectralRadius;
-
-                var matrixD = GetMatrixForDecomposition(xPartitions, initialСonditions.OperatorCoeficientsFunction,
-                    jLambda.Magnitude);
-
-                var matrixB = GetMatrixForDecomposition(xPartitions,
-                    initialСonditions.DerivedOperatorCoeficientsFunction,
-                    jLambda.Magnitude);
-
-                var matrixC = GetMatrixForDecomposition(xPartitions,
-                    initialСonditions.SecondDerivedOperatorCoeficientsFunction,
-                    jLambda.Magnitude);
-
-                var decomposition = GetDecompositionMatrices(matrixD, matrixB, matrixC);
-
-                var deltaLambda = 1 / GetDeltaLambda(decomposition);
-
-                lock (lockMe)
-                {
-                    sum += spectralRadius * deltaLambda;
-                }
-            });*/
-
-            sum /= initialСonditions.NumberPartitions;
-
-            return (int)Math.Round(sum.Magnitude);
-
-        }
-
-        private Complex GetSpectralRadius(double radius, double jPartition)
-        {
-            return radius * Complex.Exp(Complex.ImaginaryOne * 2 * Math.PI * jPartition);
+            return sum;
         }
 
         private Result SolveNewtonMethod(InitialСonditions initialСonditions)
         {
-            var eigenValues = new List<double>();
+            var eigenValues = new List<Complex>();
             eigenValues.Add(initialСonditions.L0);
 
             var xPartitions = GetPartitionForIntegrationLimit(initialСonditions);
 
-            double prevEigenValue;
-            double nextEigenValue;
+            Complex prevEigenValue;
+            Complex nextEigenValue;
 
             do
             {
@@ -300,81 +391,29 @@ namespace InitialApproximationAlgorithm
                 nextEigenValue = prevEigenValue - deltaLambda;
 
                 eigenValues.Add(nextEigenValue);
-            } while (Math.Abs(nextEigenValue - prevEigenValue) > initialСonditions.Eps && eigenValues.Count < 500);
+            } while ((nextEigenValue - prevEigenValue).Magnitude > initialСonditions.Eps/* && eigenValues.Count < 500*/);
 
             return new Result()
             {
-                ApproximatedEigenValue = eigenValues.Last(),
+                ApproximatedEigenValue = eigenValues.Last().Real,
                 CountIteration = eigenValues.Count,
-                InitialEigenValue = eigenValues.First()
+                InitialEigenValue = eigenValues.First().Real
             };
+        }
+
+        private Complex GetDeltaLambda(Decomposition decomposition)
+        {
+            Complex sum = GetSumForDivideVUDiagonal(decomposition);
+
+            var deltaLambda = 1.0 / sum;
+
+            return deltaLambda;
         }
 
         private void AddRowsToEigenValuesTable(List<Result> results)
         {
             var resultForTable = results.Select((x, i) => new { N = i, x.ApproximatedEigenValue, x.InitialEigenValue, x.CountIteration });
             EigenValuesTable.ItemsSource = resultForTable;
-        }
-
-        private void CalculateButtonClick(object sender, RoutedEventArgs e)
-        {
-            InitialСonditions initialСonditions = new InitialСonditions
-            {
-                Circle = new Circle()
-                {
-                    Center = double.Parse(CenterTextBox.Text.Replace('.', ',')),
-                    Radius = double.Parse(RadiusTextBox.Text.Replace('.', ','))
-                },
-                OperatorCoeficientsFunction = x => -Math.Pow(4 + x * x, 2),
-                DerivedOperatorCoeficientsFunction = x => -4 * (4 + x * x) * x,
-                SecondDerivedOperatorCoeficientsFunction = x => -16 - 12 * x * x,
-                NumberPartitions = int.Parse(NumberPartitionsTextBox.Text),
-                Eps = double.Parse(EpsTextBox.Text.Replace('.', ',')),
-                L0 = double.Parse(Lambda0TextBox.Text.Replace('.', ','))
-            };
-
-            var results = GetInitialApproximationWithAproximatedEigenValues(initialСonditions);
-            AddRowsToEigenValuesTable(results);
-        }
-
-        private List<Result> GetInitialApproximationWithAproximatedEigenValues(InitialСonditions initialСonditions)
-        {
-            var results = new List<Result>();
-            int countEigenValues = GetLambdaCount(initialСonditions);
-            var initialEigenValues = new List<double>();
-
-            /*for (int j = 0; j < countEigenValues; j++)
-            {
-                double jPartition = j * 1.0 / countEigenValues;
-
-                var jInitialLambda = initialСonditions.Circle.Center +
-                                     GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
-
-                initialEigenValues.Add(jInitialLambda.Real);
-                //initialСonditions.L0 = jInitialLambda.Magnitude;
-
-                //var result = SolveNewtonMethod(initialСonditions);
-
-                //results.Add(result);
-            }*/
-            Parallel.For(0, countEigenValues, (j) =>
-            {
-                double jPartition = j * 1.0 / countEigenValues;
-
-                var jInitialLambda = initialСonditions.Circle.Center +
-                                     GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
-
-                initialСonditions.L0 = jInitialLambda.Real;
-
-                var result = SolveNewtonMethod(initialСonditions);
-
-                lock (lockMe)
-                {
-                    results.Add(result);
-                }
-            });
-
-            return results;
         }
     }
 }
