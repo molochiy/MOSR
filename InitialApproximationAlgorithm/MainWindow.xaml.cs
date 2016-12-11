@@ -61,6 +61,8 @@ namespace InitialApproximationAlgorithm
         public double InitialEigenValue { get; set; }
         public double ApproximatedEigenValue { get; set; }
         public int CountIteration { get; set; }
+        public double LowerBound { get; set; }
+        public double UpperBound { get; set; }
     }
 
     public partial class MainWindow : Window
@@ -70,6 +72,8 @@ namespace InitialApproximationAlgorithm
         {
             InitializeComponent();
         }
+
+        List<Result> results = new List<Result>();
 
         private void CalculateButtonClick(object sender, RoutedEventArgs e)
         {
@@ -93,27 +97,51 @@ namespace InitialApproximationAlgorithm
 
         private List<Result> GetInitialApproximationWithAproximatedEigenValues(InitialСonditions initialСonditions)
         {
-            var results = new List<Result>();
+            
             var sk0 = GetSkValue(initialСonditions, 0);
             int countEigenValues = (int)Math.Round(sk0);
             var initialEigenValues = new List<Complex>();
             var sk = new List<double>();
-
-            for (int j = 1; j <= countEigenValues; j++)
+            if (countEigenValues > 0)
             {
-                var skj = GetSkValue(initialСonditions, j);
-                sk.Add(skj);
-                //double jPartition = j * 1.0 / countEigenValues;
+                for (int j = 1; j <= countEigenValues; j++)
+                {
+                    var skj = GetSkValue(initialСonditions, j);
+                    sk.Add(skj);
+                    //double jPartition = j * 1.0 / countEigenValues;
 
-                //var jInitialLambda = initialСonditions.Circle.Center +
-                                     //GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
+                    //var jInitialLambda = initialСonditions.Circle.Center +
+                    //GetSpectralRadius(initialСonditions.Circle.Radius, jPartition);
 
-                //initialEigenValues.Add(jInitialLambda);
-                initialСonditions.L0 = skj;
+                    //initialEigenValues.Add(jInitialLambda);
+                    initialСonditions.L0 = skj;
 
-                var result = SolveNewtonMethod(initialСonditions);
+                    var result = SolveNewtonMethod(initialСonditions);
+                    result.LowerBound = initialСonditions.Circle.Center - initialСonditions.Circle.Radius;
+                    result.UpperBound = initialСonditions.Circle.Center + initialСonditions.Circle.Radius;
 
-                results.Add(result);
+                    results.Add(result);
+                }
+            }
+            else
+            {
+                InitialСonditions newInitialСonditions = new InitialСonditions
+                {
+                    Circle = new Circle()
+                    {
+                        Center = initialСonditions.Circle.Center + initialСonditions.Circle.Radius,
+                        Radius = initialСonditions.Circle.Radius
+                    },
+                    OperatorCoeficientsFunction = x => -(4 + x * x) * (4 + x * x),
+                    DerivedOperatorCoeficientsFunction = x => -4 * (4 + x * x) * x,
+                    SecondDerivedOperatorCoeficientsFunction = x => -16 - 12 * x * x,
+                    NumberPartitions = initialСonditions.NumberPartitions,
+                    Eps = initialСonditions.Eps
+                };
+
+                results.Add(new Result() { ApproximatedEigenValue = 0, CountIteration = 0, InitialEigenValue = 0, LowerBound = initialСonditions.Circle.Center - initialСonditions.Circle.Radius, UpperBound = initialСonditions.Circle.Center + initialСonditions.Circle.Radius });
+
+                GetInitialApproximationWithAproximatedEigenValues(newInitialСonditions);
             }
 
             #region Parallel
@@ -412,7 +440,7 @@ namespace InitialApproximationAlgorithm
 
         private void AddRowsToEigenValuesTable(List<Result> results)
         {
-            var resultForTable = results.Select((x, i) => new { N = i, x.ApproximatedEigenValue, x.InitialEigenValue, x.CountIteration });
+            var resultForTable = results.Select((x, i) => new { N = i, Interval = string.Format("[{0}, {1}]", x.LowerBound, x.UpperBound), x.ApproximatedEigenValue, x.InitialEigenValue, x.CountIteration });
             EigenValuesTable.ItemsSource = resultForTable;
         }
     }

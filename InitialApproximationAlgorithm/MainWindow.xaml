@@ -17,6 +17,7 @@
         <DataGrid x:Name="EigenValuesTable" HorizontalAlignment="Left" Margin="51,190,0,10" Width="511" AutoGenerateColumns="False" ItemsSource="{Binding}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№" Binding="{Binding N}" Width="30"></DataGridTextColumn>
+                <DataGridTextColumn Header="Інтервал" Binding="{Binding Interval}" Width="70"></DataGridTextColumn>
                 <DataGridTextColumn Header="Початкове наближення" Binding="{Binding InitialEigenValue}" Width="*"></DataGridTextColumn>
                 <DataGridTextColumn Header="Уточнене значення" Binding="{Binding ApproximatedEigenValue}" Width="*"></DataGridTextColumn>
                 <DataGridTextColumn Header="Кількість ітерацій" Binding="{Binding CountIteration}" Width="115"></DataGridTextColumn>
