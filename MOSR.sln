@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlternatelyApproximationMet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncludingMonotonousApproximationMethod", "IncludingMonotonousApproximationMethod\IncludingMonotonousApproximationMethod.csproj", "{E336E653-DE3C-471F-830B-3565349915C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalleyUnilateralApproximation", "HalleyUnilateralApproximation\HalleyUnilateralApproximation.csproj", "{883BB26B-C0C8-470F-B889-50D3FAF59377}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalleyBilateralFirstApproachApproximation", "HalleyBilateralFirstApproachApproximation\HalleyBilateralFirstApproachApproximation.csproj", "{43C0B040-557D-4D63-8BCC-B3698F78E7A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalleyBilateralSecondApproachApproximation", "HalleyBilateralSecondApproachApproximation\HalleyBilateralSecondApproachApproximation.csproj", "{ED1E78CE-B9D3-4A2A-967B-3867193D7426}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +57,18 @@ Global
 		{E336E653-DE3C-471F-830B-3565349915C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E336E653-DE3C-471F-830B-3565349915C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E336E653-DE3C-471F-830B-3565349915C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{883BB26B-C0C8-470F-B889-50D3FAF59377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{883BB26B-C0C8-470F-B889-50D3FAF59377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{883BB26B-C0C8-470F-B889-50D3FAF59377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{883BB26B-C0C8-470F-B889-50D3FAF59377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C0B040-557D-4D63-8BCC-B3698F78E7A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43C0B040-557D-4D63-8BCC-B3698F78E7A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43C0B040-557D-4D63-8BCC-B3698F78E7A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43C0B040-557D-4D63-8BCC-B3698F78E7A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED1E78CE-B9D3-4A2A-967B-3867193D7426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED1E78CE-B9D3-4A2A-967B-3867193D7426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED1E78CE-B9D3-4A2A-967B-3867193D7426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED1E78CE-B9D3-4A2A-967B-3867193D7426}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
